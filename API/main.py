@@ -50,16 +50,3 @@ def search_title(text: str, db: Session = Depends(get_db)):
     if not results:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= f"Title with the word '{text}' is not available")
     return results
-
-@app.get('/articles', tags=['RSS'])
-def get_arcticles(db: Session = Depends(get_db)):
-    para_list = []
-    article_links = db.query(RssResults.link).all()
-    for article_link in article_links:
-        page = requests.get(article_link[0])
-        soup = BeautifulSoup(page.content, 'html.parser')
-        results = soup.find('article', class_='wrap-column-1')
-        paras= results.find_all('p')
-        for para in paras:
-            para_list.append(para)
-    return para_list
